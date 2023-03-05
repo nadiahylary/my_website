@@ -1,0 +1,10 @@
+{% load  static %}
+<header id="main-navigation">
+    <h1><a href="{% url "index-page" %}">NH Kruger's Blog </a></h1>
+    <nav>
+        &nbsp;{% comment %}<span><a href="{% url "index-page" %}">Home</a></span>{% endcomment %}
+        &nbsp;&nbsp;<span><a href="{% url "posts-page" %}">All Blog Posts</a></span>
+        &nbsp;&nbsp;<span><a href="{% url "about-page" %}">About Me</a></span>
+        &nbsp;&nbsp;<span><a href="{% url "contact-page" %}">Contact</a></span>
+    </nav>
+</header>

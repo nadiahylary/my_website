@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My blog{% endblock %}
+{% block css_files %}
+    <link rel="stylesheet" href="{% static "/blog/post.css" %}">
+    <link rel="stylesheet" href="{% static "/blog/index.css" %}">
+{% endblock %}
+
+{% block content %}
+    {% include 'blog/includes/header.html' %}
+    <section id = "welcome">
+        <header>
+            <img src="{% static "blog/images/me.png" %}" alt="NH - The Author Of This Blog">
+            <h2>Welcome To My Blog!</h2>
+        </header>
+        <p>Hi, I am NH and I love life and blogging about
+            stuffs I'm interested in!</p>
+    </section>
+
+    <section id="latest-posts">
+        <h2>My Recent Blog Articles:</h2>
+    <ul>
+        {% for post in posts %}
+        {% include "blog/includes/post.html" %}
+        {% endfor %}
+    </ul>
+    </section>
+
+    <section id="about">
+        <h2>What I do</h2>
+        <p>Study Software Engineering</p>
+        <p>I love programming web(mostly backend though) and mobile apps</p>
+        <p>I love to help others the best way I can and learn from everything
+            and anything I do.</p>
+        <p>Learning To Sew</p>
+        <p>I love learning foreign languages and valuable skills.</p>
+    </section>
+
+{% endblock %}
