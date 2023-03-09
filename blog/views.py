@@ -1,5 +1,5 @@
 from django.http import HttpResponse, Http404, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 
 from blog.models import Post
@@ -7,18 +7,19 @@ from blog.models import Post
 
 # from .blog_posts_dict import blog_posts
 
-
-def get_date(post):
+"""def get_date(post):
     return post.date_created
-
+"""
 
 # Create your views here.
+
+
 def index(request):
-    blog_posts = Post.objects.all()
-    sorted_posts = sorted(blog_posts, key=get_date)
-    latest_posts = sorted_posts[:3]
+    blog_posts = Post.objects.all().order_by("-date_created")[:3]
+    # sorted_posts = sorted(blog_posts, key=get_date)
+    # latest_posts = blog_posts
     return render(request, "blog/index.html", {
-        "posts": latest_posts,
+        "posts": blog_posts,
 
     })
 
@@ -32,10 +33,10 @@ def index(request):
 
 
 def posts(request):
-    blog_posts = Post.objects.all()
-    sorted_posts = sorted(blog_posts, key=get_date)
+    blog_posts = Post.objects.all().order_by("-date_created")
+    # sorted_posts = sorted(blog_posts, key=get_date)
     return render(request, "blog/all-posts.html", {
-        "posts": sorted_posts,
+        "posts": blog_posts,
 
     })
 
@@ -54,10 +55,10 @@ def detail_post(request, slug):
     for post in blog_posts:
         if post['slug'] == slug:
             post_detail = post"""
-    blog_posts = Post.objects.filter(slug=slug)
-    post_detail = next(post for post in blog_posts)
+    blog_post = get_object_or_404(Post, slug=slug)
+    # post_detail = next(post for post in blog_post)
     return render(request, "blog/detail-post.html", {
-        'post': post_detail
+        'post': blog_post
     })
 
 

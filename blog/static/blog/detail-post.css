@@ -26,6 +26,14 @@ body {
 #summary h2 {
   color: white;
   font-size: 4.5rem;
+  margin-bottom: 0.25rem;
+}
+.tag{
+  color: #000000;
+  text-decoration: none;
+  background-color: #e1e1e1;
+  border-radius: 5px;
+  padding: 0.5rem 1rem;
 }
 
 #summary article {

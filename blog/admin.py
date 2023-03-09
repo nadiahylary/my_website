@@ -7,7 +7,7 @@ from .models import Post, Author, Tag
 
 class PostAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("title",)}
-    list_filter = ("date_created", )
+    list_filter = ("date_created", "author", "tags")
     list_display = ("title", "author", "date_created")
 
 
