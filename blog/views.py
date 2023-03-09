@@ -2,15 +2,19 @@ from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .blog_posts_dict import blog_posts
+from blog.models import Post
+
+
+# from .blog_posts_dict import blog_posts
 
 
 def get_date(post):
-    return post['date_created']
+    return post.date_created
 
 
 # Create your views here.
 def index(request):
+    blog_posts = Post.objects.all()
     sorted_posts = sorted(blog_posts, key=get_date)
     latest_posts = sorted_posts[:3]
     return render(request, "blog/index.html", {
@@ -28,8 +32,10 @@ def index(request):
 
 
 def posts(request):
+    blog_posts = Post.objects.all()
+    sorted_posts = sorted(blog_posts, key=get_date)
     return render(request, "blog/all-posts.html", {
-        "posts": blog_posts,
+        "posts": sorted_posts,
 
     })
 
@@ -48,7 +54,8 @@ def detail_post(request, slug):
     for post in blog_posts:
         if post['slug'] == slug:
             post_detail = post"""
-    post_detail = next(post for post in blog_posts if post['slug'] == slug)
+    blog_posts = Post.objects.filter(slug=slug)
+    post_detail = next(post for post in blog_posts)
     return render(request, "blog/detail-post.html", {
         'post': post_detail
     })

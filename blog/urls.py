@@ -7,4 +7,5 @@ urlpatterns = [
     path("posts/<slug:slug>", views.detail_post, name="detail-post-page"),
     path("about",  views.about, name="about-page"),
     path("contact",  views.contact, name="contact-page")
+
 ]
