@@ -36,6 +36,9 @@ class Post(models.Model):
                                null=True, related_name="posts")
     tags = models.ManyToManyField(Tag)
 
+    def __str__(self):
+        return self.title
+
     def absolute_url_slug(self):
         return reverse("detail-post-page", args=[self.slug])
 

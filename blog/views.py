@@ -1,6 +1,7 @@
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
+from django.views.generic import ListView, DetailView
 
 from blog.models import Post
 
@@ -10,18 +11,29 @@ from blog.models import Post
 """def get_date(post):
     return post.date_created
 """
-
 # Create your views here.
 
 
-def index(request):
-    blog_posts = Post.objects.all().order_by("-date_created")[:3]
-    # sorted_posts = sorted(blog_posts, key=get_date)
-    # latest_posts = blog_posts
-    return render(request, "blog/index.html", {
-        "posts": blog_posts,
+class IndexListView(ListView):
+    template_name = "blog/index.html"
+    model = Post
+    context_object_name = "posts"
+    ordering = ['-date_created']
 
-    })
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        data = queryset[:3]
+        return data
+
+
+# def index(request):
+#     blog_posts = Post.objects.all().order_by("-date_created")[:3]
+#     # sorted_posts = sorted(blog_posts, key=get_date)
+#     # latest_posts = blog_posts
+#     return render(request, "blog/index.html", {
+#         "posts": blog_posts,
+#
+#     })
 
 
 """response_data = ""
@@ -32,13 +44,20 @@ def index(request):
     return HttpResponse(f"<h1>Welcome to my blog!</h1><h2>Some recent blog posts</h2>{response_data}")"""
 
 
-def posts(request):
-    blog_posts = Post.objects.all().order_by("-date_created")
-    # sorted_posts = sorted(blog_posts, key=get_date)
-    return render(request, "blog/all-posts.html", {
-        "posts": blog_posts,
+class AllPostsView(ListView):
+    template_name = "blog/all-posts.html"
+    model = Post
+    context_object_name = "posts"
+    ordering = ['-date_created']
 
-    })
+
+# def posts(request):
+#     blog_posts = Post.objects.all().order_by("-date_created")
+#     # sorted_posts = sorted(blog_posts, key=get_date)
+#     return render(request, "blog/all-posts.html", {
+#         "posts": blog_posts,
+#
+#     })
 
 
 """response_data = ""
@@ -48,6 +67,12 @@ def posts(request):
         response_data += f"<li><a href = '{detail_post(request, key)}'>" + key + "</a></li>"
     response_data = f"<h1>All blog posts</h1><ul>{response_data}</ul>"
     return HttpResponse(response_data)"""
+
+
+class DetailPostView(DetailView):
+    template_name = "blog/detail-post.html"
+    model = Post
+    context_object_name = "post"
 
 
 def detail_post(request, slug):
