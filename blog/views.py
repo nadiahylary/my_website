@@ -1,16 +1,19 @@
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
+from django.views import View
 from django.views.generic import ListView, DetailView
 
+from blog.forms import CommentForm
 from blog.models import Post
-
 
 # from .blog_posts_dict import blog_posts
 
 """def get_date(post):
     return post.date_created
 """
+
+
 # Create your views here.
 
 
@@ -72,19 +75,91 @@ class AllPostsView(ListView):
 class DetailPostView(DetailView):
     template_name = "blog/detail-post.html"
     model = Post
-    context_object_name = "post"
+
+    # context_object_name = "post"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["comment_form"] = CommentForm()
+        return context
 
 
-def detail_post(request, slug):
-    """post_detail = None
-    for post in blog_posts:
-        if post['slug'] == slug:
-            post_detail = post"""
-    blog_post = get_object_or_404(Post, slug=slug)
-    # post_detail = next(post for post in blog_post)
-    return render(request, "blog/detail-post.html", {
-        'post': blog_post
-    })
+class PostDetailView(View):
+    def is_saved(self, request, post_id):
+        saved_posts = request.session.get("saved_posts")
+        if saved_posts is not None:
+            is_saved = post_id in saved_posts
+        else:
+            is_saved = False
+        return is_saved
+
+    def get(self, request, slug):
+        post = Post.objects.get(slug=slug)
+        context = {
+            "post": post,
+            "comment_form": CommentForm(),
+            "is_saved": self.is_saved(request, post.id)
+        }
+        return render(request, "blog/detail-post.html", context)
+
+    def post(self, request, slug):
+        comment_form = CommentForm(request.POST)
+        post = Post.objects.get(slug=slug)
+
+        if comment_form.is_valid():
+            comment = comment_form.save(commit=False)
+            comment.post = post
+            comment.save()
+
+            return HttpResponseRedirect(reverse("detail-post-page", args=[slug]))
+
+        context = {
+            "post": post,
+            "comment_form": comment_form,
+            "is_saved": self.is_saved(request, post.id)
+        }
+        return render(request, "blog/detail-post.html", context)
+
+
+class ReadLaterView(View):
+
+    def get(self, request):
+        context = {}
+        saved_posts = request.session.get("saved_posts")
+        if saved_posts is None or len(saved_posts) == 0:
+            context["posts"] = []
+            context["has_posts"] = False
+        else:
+            posts = Post.objects.filter(id__in=saved_posts)
+            context["posts"] = posts
+            context["has_posts"] = True
+        return render(request, "blog/stored-posts.html", context)
+
+    def post(self, request):
+        saved_posts = request.session.get("saved_posts")
+        if saved_posts is None:
+            saved_posts = []
+        post_id = int(request.POST["post_id"])
+        if post_id not in saved_posts:
+            saved_posts.append(post_id)
+            print(post_id)
+        else:
+            saved_posts.remove(post_id)
+
+        request.session["saved_posts"] = saved_posts
+        return HttpResponseRedirect("/")
+
+
+# def detail_post(request, slug):
+#     """post_detail = None
+#     for post in blog_posts:
+#         if post['slug'] == slug:
+#             post_detail = post"""
+#     blog_post = get_object_or_404(Post, slug=slug)
+#     # post_detail = next(post for post in blog_post)
+#     return render(request, "blog/detail-post.html", {
+#         'post': blog_post
+#     })
 
 
 """try:

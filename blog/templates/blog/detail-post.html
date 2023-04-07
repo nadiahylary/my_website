@@ -10,28 +10,67 @@
 {% block content %}
     {% include "blog/includes/header.html" %}
     <section id="summary">
-    <h2>
-        {{ post.title}}
-    </h2>
+    <h2>{{ post.title}}</h2>
     <div class="tags">
         {% for tag in post.tags.all %}
             <span class="tag"># {{tag}} </span>
         {% endfor %}
     </div>
-    <article>
-        <img src="{{ post.image.url  }}" alt="{{ post.title }}">
-        <address>By <a href="mailto:{{ post.author.email }}">{{ post.author.full_name}}</a></address>
-        <div>
-            Created on <time>{{ post.date_created|date:"d M Y h:m" }}</time>
-        </div>
-        {% comment %}<div>
-            Last updated on <time></time>
-        </div>{% endcomment %}
 
-    </article>
+    <div id="read-later">
+        <form action="{% url "read-later" %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" value="{{ post.id }}" name="post_id">
+            <button >
+                {% if is_saved %}
+                    Remove from Read Later
+                {% else %}
+                    Read Later
+                {% endif %}
+            </button>
+        </form>
+    </div>
+
+        <article>
+            <img src="{{ post.image.url  }}" alt="{{ post.title }}">
+            <address>By <a href="mailto:{{ post.author.email }}">{{ post.author.full_name}}</a></address>
+            <div>
+                Created on <time>{{ post.date_created|date:"d M Y h:m" }}</time>
+            </div>
+            {% comment %}<div>
+                Last updated on <time></time>
+            </div>{% endcomment %}
+
+        </article>
     </section>
 
     <main>
         <p>{{ post.content|linebreaks }}</p>
     </main>
+
+    <section id="comment-form">
+        <h2>Your Comment</h2>
+        <form action="{% url "detail-post-page" post.slug %}" method="POST">
+        {% csrf_token %}
+        {% for field in comment_form %}
+            <div class="form-control {% if form_field.errors %}invalid{% endif %}">
+                {{ field.label_tag }}
+                {{ field }}
+                {{ field.errors }}
+            </div>
+        {% endfor %}
+            <button>Submit</button>
+      </form>
+    </section>
+
+    <section id="comments">
+        <ul>
+        {% for comment in post.comments.all %}
+            <li>
+                <h2>{{ comment.user_name }}</h2>
+                <p>{{ comment.comment_text|linebreaks }}</p>
+            </li>
+        {% endfor %}
+        </ul>
+    </section>
 {% endblock %}
